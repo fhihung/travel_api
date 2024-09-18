@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TourSuggestionController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -63,3 +64,4 @@ Route::get('expense_by_week_of_current_month', [TransactionController::class, 'g
 
 //Route tạo transaction
 Route::post('create_transaction', [TransactionController::class, 'store']);
+Route::post('/tour-suggestion', [TourSuggestionController::class, 'getSuggestion']);
