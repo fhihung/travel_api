@@ -11,13 +11,16 @@ class TourSuggestionController extends Controller
     {
         // Lấy dữ liệu từ request
         $location = $request->input('location');
-        $numPeople = $request->input('numPeople');
+        $budget = $request->input('budget');
+        $total_people = $request->input('total_people');
         $duration = $request->input('duration');
         $type = $request->input('type');
+        $current_location = $request->input('current_location');
         $model = $request->input('model', 'openai'); // Giá trị mặc định là 'openai'
 
         // Tạo prompt chung cho cả hai mô hình
-        $prompt = "Hãy gợi ý một lịch trình du lịch cho {$numPeople} người đến {$location} trong {$duration}, với loại hình du lịch {$type}. Vui lòng trả về kết quả dưới dạng JSON với cấu trúc như sau:
+        $prompt = "Hãy gợi ý một lịch trình du lịch chi tiết cho {$total_people} người từ {$current_location} đến {$location} trong {$duration}, với loại hình du lịch {$type} và ngân sách {$budget} cho cả nhóm .
+    Vui lòng trả về kết quả dưới dạng JSON với cấu trúc như sau:
     {
       \"location\": \"Tên địa điểm\",
       \"days\": \"Số ngày đi du lịch\",
@@ -27,15 +30,23 @@ class TourSuggestionController extends Controller
           \"schedule\": [
             {
               \"time\": \"8:00 AM\",
-              \"activity\": \"Mô tả hoạt động buổi sáng\"
+              \"activity\": \"Mô tả hoạt động buổi sáng\",
+              \"transport\": \"Phương tiện di chuyển\",
+              \"cost\": \"Chi phí cho hoạt động\"
             },
             {
               \"time\": \"12:00 PM\",
-              \"activity\": \"Mô tả hoạt động buổi trưa\"
+              \"activity\": \"Mô tả hoạt động buổi trưa\",
+              \"restaurant\": {
+                \"name\": \"Tên nhà hàng\",
+                \"type\": \"Loại món ăn\",
+                \"price_range\": \"Khoảng giá\"
+              }
             },
             {
               \"time\": \"6:00 PM\",
-              \"activity\": \"Mô tả hoạt động buổi tối\"
+              \"activity\": \"Mô tả hoạt động buổi tối\",
+              \"cost\": \"Chi phí cho hoạt động\"
             }
           ]
         },
@@ -44,27 +55,42 @@ class TourSuggestionController extends Controller
           \"schedule\": [
             {
               \"time\": \"8:00 AM\",
-              \"activity\": \"Mô tả hoạt động buổi sáng\"
+              \"activity\": \"Mô tả hoạt động buổi sáng\",
+              \"transport\": \"Phương tiện di chuyển\",
+              \"cost\": \"Chi phí cho hoạt động\"
             },
             {
               \"time\": \"12:00 PM\",
-              \"activity\": \"Mô tả hoạt động buổi trưa\"
+              \"activity\": \"Mô tả hoạt động buổi trưa\",
+              \"restaurant\": {
+                \"name\": \"Tên nhà hàng\",
+                \"type\": \"Loại món ăn\",
+                \"price_range\": \"Khoảng giá\"
+              }
             },
             {
               \"time\": \"6:00 PM\",
-              \"activity\": \"Mô tả hoạt động buổi tối\"
+              \"activity\": \"Mô tả hoạt động buổi tối\",
+              \"cost\": \"Chi phí cho hoạt động\"
             }
           ]
         }
       ],
-      \"costEstimate\": \"Ước tính chi phí\",
+      \"cost_estimate\": \"Chi phí chính xác/người\",
       \"hotels\": [
         {
-          \"hotelName\": \"Tên khách sạn\",
-          \"website\": \"Đường link website\"
+          \"name\": \"Tên khách sạn\",
+          \"website\": \"Đường link website\",
+          \"price_per_night\": \"Giá mỗi đêm\",
+          \"rating\": \"Xếp hạng khách sạn\"
         }
-      ]
+      ],
+      \"transportation\": {
+        \"from_current_location\": \"Phương tiện di chuyển từ {$current_location} đến {$location}\",
+        \"within_destination\": \"Phương tiện di chuyển trong suốt chuyến đi\"
+      }
     }";
+
 
         if ($model === 'openai') {
             // Gọi OpenAI API
@@ -90,7 +116,7 @@ class TourSuggestionController extends Controller
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'max_tokens' => 500,
+            'max_tokens' => 1500,
             'temperature' => 0.7,
         ]);
 
@@ -109,7 +135,7 @@ class TourSuggestionController extends Controller
     {
         set_time_limit(60);
         $apiKey = env('GEMINI_API_KEY'); // Lấy API key từ file .env
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' . $apiKey;
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $apiKey;
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
