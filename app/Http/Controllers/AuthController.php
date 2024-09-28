@@ -44,18 +44,10 @@ class AuthController extends Controller
             'role' => $request->get('role')
         ]);
 
-        // Create a wallet account for the user
-        $account = $user->accounts()->create([
-            'name' => 'wallet',
-            'account_number' => '_', // Generate this as needed
-            'balance' => 0, // or any initial balance you want
-            'alias' => 'wallet'
-        ]);
-
         // Generate a JWT token for the user
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(compact('user', 'token', 'account'), 201);
+        return response()->json(compact('user', 'token'), 201);
     }
 
 
