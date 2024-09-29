@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TourSuggestionController extends Controller
 {
@@ -119,6 +120,8 @@ class TourSuggestionController extends Controller
             'max_tokens' => 1500,
             'temperature' => 0.7,
         ]);
+        // Log phản hồi từ API
+       Log::info('OpenAI Response:', $response->json());
 
         // Kiểm tra nếu phản hồi hợp lệ
         if ($response->successful()) {
