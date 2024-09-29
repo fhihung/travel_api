@@ -121,7 +121,7 @@ class TourSuggestionController extends Controller
             'temperature' => 0.7,
         ]);
         // Log phản hồi từ API
-       Log::info('OpenAI Response:', $response->json());
+        \Log::info('Request Data:', $response->all());
 
         // Kiểm tra nếu phản hồi hợp lệ
         if ($response->successful()) {
