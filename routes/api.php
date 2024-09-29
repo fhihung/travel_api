@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('user', [App\Http\Controllers\AuthController::class, 'getAuthenticatedUser']);
     Route::post('logout', [App\Http\Controllers\AuthController::class, 'logout']);
+    Route::delete('user/delete', [App\Http\Controllers\AuthController::class, 'deleteAccount']); // Add this route for account deletion
 });
 
 Route::post('register', [App\Http\Controllers\AuthController::class, 'register']);

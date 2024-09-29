@@ -94,4 +94,27 @@ class AuthController extends Controller
             return response()->json(['error' => 'Failed to logout, please try again'], 500);
         }
     }
+    public function deleteAccount(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            // Authenticate the user with JWT token
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            // Delete the user account
+            $user->delete();
+
+            return response()->json(['message' => 'Account deleted successfully'], 200);
+
+        } catch (TokenExpiredException $e) {
+            return response()->json(['error' => 'Token expired'], 401);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'Invalid token'], 401);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Token absent'], 401);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete account, please try again'], 500);
+        }
+    }
 }
