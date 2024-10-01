@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PopularSuggestionController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\TourSuggestionController;
 use App\Http\Controllers\TransactionController;
@@ -28,6 +30,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('user', [App\Http\Controllers\AuthController::class, 'getAuthenticatedUser']);
     Route::post('logout', [App\Http\Controllers\AuthController::class, 'logout']);
     Route::delete('user/delete', [App\Http\Controllers\AuthController::class, 'deleteAccount']); // Add this route for account deletion
+    Route::post('refresh-token', [App\Http\Controllers\AuthController::class, 'refreshToken']);
 });
 
 Route::post('register', [App\Http\Controllers\AuthController::class, 'register']);
@@ -39,3 +42,13 @@ Route::post('/tour-suggestion', [TourSuggestionController::class, 'getSuggestion
 
 Route::apiResource('suggestions', SuggestionController::class);
 Route::get('suggestions/user/{user_id}', [SuggestionController::class, 'getSuggestionByUserId']);
+
+// Route tạo activity cho một popular suggestion cụ thể
+Route::post('popular-suggestions/{popular_suggestion_id}/activities', [ActivityController::class, 'store']);
+
+// Route lấy các activities cho một popular suggestion cụ thể
+//Route::get('popular-suggestions/{popular_suggestion_id}/activities', [ActivityController::class, 'index']);
+
+// Route tạo suggestion mới (PopularSuggestion)
+Route::post('popular-suggestions', [PopularSuggestionController::class, 'store']);
+Route::get('popular-suggestions', [PopularSuggestionController::class, 'index']);
